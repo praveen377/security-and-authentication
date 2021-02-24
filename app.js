@@ -1,6 +1,6 @@
 //jshint esversion:6
 //require .env file to keep secrets
-
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser")
 const ejs = require("ejs");
@@ -24,10 +24,11 @@ const userschema =new mongoose.Schema({
 //this is the key
 // this is the secret key any one can see this
 //and use to decrpt our secrets 
-//thi is not good
-const secret = "thisissecret";
+//this is not good
+// to overcome this ambiguity we use .env file to keep secrets secure
+// const secret = "thisissecret";
 
-
+secret = process.env.SECRET;
 
 //make a secret plugins before making collections
 userschema.plugin(encrypt,{secret:secret,encryptedFields:['password']});
