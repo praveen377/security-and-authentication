@@ -5,8 +5,9 @@ const express = require("express");
 const bodyParser = require("body-parser")
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-//for encryption this package is required
-const encrypt = require("mongoose-encryption");
+const md5 = require("md5");
+
+
 
 const app = express();
 app.use(express.static("public"));
@@ -21,17 +22,6 @@ const userschema =new mongoose.Schema({
     password:String
 });
 
-//this is the key
-// this is the secret key any one can see this
-//and use to decrpt our secrets 
-//this is not good
-// to overcome this ambiguity we use .env file to keep secrets secure
-// const secret = "thisissecret";
-
-secret = process.env.SECRET;
-
-//make a secret plugins before making collections
-userschema.plugin(encrypt,{secret:secret,encryptedFields:['password']});
 
 //make a collection named as User(in data base it is plural form(users))
 const User = new mongoose.model("User",userschema);
@@ -54,7 +44,7 @@ app.get("/register",function(req,res){
 app.post("/register",function(req,res){
     const newUser = new User({
         email: req.body.username,
-        password: req.body.password
+        password: md5(req.body.password)
     });
     newUser.save(function(err){
         if(err)
@@ -71,7 +61,7 @@ app.post("/register",function(req,res){
 
 app.post("/login",function(req,res){
     const username = req.body.username;
-    const password = req.body.password;
+    const password = md5(req.body.password);
     User.findOne({email:username},function(err,founduser){
 
         if(err)
